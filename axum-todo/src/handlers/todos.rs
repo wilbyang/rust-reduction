@@ -2,7 +2,7 @@ use axum::extract::{Query, State};
 use axum::Json;
 use axum::response::IntoResponse;
 use serde::Deserialize;
-use crate::models::{Db, Todo};
+use crate::models::Db;
 
 // The query parameters for todos index
 #[derive(Debug, Deserialize, Default)]
