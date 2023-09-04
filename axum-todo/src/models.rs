@@ -1,6 +1,6 @@
 use anyhow::Result;
 use libsql_client::client::Client;
-use libsql_client::proto::Stmt;
+
 use libsql_client::Statement;
 use serde::Serialize;
 use std::collections::HashMap;
