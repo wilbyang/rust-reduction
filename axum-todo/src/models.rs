@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
-pub type Db = Arc<RwLock<HashMap<Uuid, Todo>>>;
+pub type Db = dashmap::DashMap<Uuid, Todo>;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct Todo {

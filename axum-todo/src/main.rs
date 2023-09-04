@@ -74,7 +74,7 @@ async fn todos_create(State(db): State<Db>, Json(input): Json<CreateTodo>) -> im
         completed: false,
     };
 
-    db.write().unwrap().insert(todo.id, todo.clone());
+    db.insert(todo.id, todo.clone());
 
     (StatusCode::CREATED, Json(todo))
 }
@@ -91,11 +91,9 @@ async fn todos_update(
     Json(input): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
     let mut todo = db
-        .read()
-        .unwrap()
         .get(&id)
-        .cloned()
-        .ok_or(StatusCode::NOT_FOUND)?;
+        .ok_or_else(|| StatusCode::NOT_FOUND)?
+        .clone();
 
     if let Some(text) = input.text {
         todo.text = text;
@@ -105,13 +103,13 @@ async fn todos_update(
         todo.completed = completed;
     }
 
-    db.write().unwrap().insert(todo.id, todo.clone());
+    db.insert(id, todo.clone());
 
     Ok(Json(todo))
 }
 
 async fn todos_delete(Path(id): Path<Uuid>, State(db): State<Db>) -> impl IntoResponse {
-    if db.write().unwrap().remove(&id).is_some() {
+    if db.remove(&id).is_some() {
         StatusCode::NO_CONTENT
     } else {
         StatusCode::NOT_FOUND

@@ -15,12 +15,11 @@ pub async fn todos_index(
     pagination: Option<Query<Pagination>>,
     State(db): State<Db>,
 ) -> impl IntoResponse {
-    let todos = db.read().unwrap();
+    
 
     let Query(pagination) = pagination.unwrap_or_default();
 
-    let todos = todos
-        .values()
+    let todos = db.into_read_only().values()
         .skip(pagination.offset.unwrap_or(0))
         .take(pagination.limit.unwrap_or(usize::MAX))
         .cloned()
