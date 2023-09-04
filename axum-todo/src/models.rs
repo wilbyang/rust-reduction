@@ -3,8 +3,7 @@ use libsql_client::client::Client;
 
 use libsql_client::Statement;
 use serde::Serialize;
-use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
+
 use uuid::Uuid;
 
 pub type Db = dashmap::DashMap<Uuid, Todo>;
