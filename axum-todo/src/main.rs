@@ -1,35 +1,28 @@
-mod handlers;
-mod models;
-use models::{Db, Todo};
-use handlers::todos::todos_index;
+use std::net::SocketAddr;
+use std::sync::Arc;
+use std::time::Duration;
+
 use axum::{
     error_handling::HandleErrorLayer,
-    extract::{Path, State},
     http::StatusCode,
-    response::IntoResponse,
+    Router,
     routing::{get, patch},
-    Json, Router,
 };
-use serde::Deserialize;
-use std::time::Duration;
-use std::net::SocketAddr;
-
 use tower::{BoxError, ServiceBuilder};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use uuid::Uuid;
+
+
+use models::{DashMapRepo, TodoRepository};
+use handlers::{todos_create, todos_delete, todos_index, todos_update};
+mod handlers;
+mod models;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "example_todos=debug,tower_http=debug".into()),
-        )
-        .with(tracing_subscriber::fmt::layer())
-        .init();
-
-    let db = Db::default();
+    // db does not live long enough, so it must be explicitly annotated
+    let db =  DashMapRepo::default();
+    let db = Arc::new(db);
 
     // Compose the routes
     let app = Router::new()
@@ -61,57 +54,3 @@ async fn main() {
 }
 
 
-
-#[derive(Debug, Deserialize)]
-struct CreateTodo {
-    text: String,
-}
-
-async fn todos_create(State(db): State<Db>, Json(input): Json<CreateTodo>) -> impl IntoResponse {
-    let todo = Todo {
-        id: Uuid::new_v4(),
-        text: input.text,
-        completed: false,
-    };
-
-    db.insert(todo.id, todo.clone());
-
-    (StatusCode::CREATED, Json(todo))
-}
-
-#[derive(Debug, Deserialize)]
-struct UpdateTodo {
-    text: Option<String>,
-    completed: Option<bool>,
-}
-
-async fn todos_update(
-    Path(id): Path<Uuid>,
-    State(db): State<Db>,
-    Json(input): Json<UpdateTodo>,
-) -> Result<impl IntoResponse, StatusCode> {
-    let mut todo = db
-        .get(&id)
-        .ok_or_else(|| StatusCode::NOT_FOUND)?
-        .clone();
-
-    if let Some(text) = input.text {
-        todo.text = text;
-    }
-
-    if let Some(completed) = input.completed {
-        todo.completed = completed;
-    }
-
-    db.insert(id, todo.clone());
-
-    Ok(Json(todo))
-}
-
-async fn todos_delete(Path(id): Path<Uuid>, State(db): State<Db>) -> impl IntoResponse {
-    if db.remove(&id).is_some() {
-        StatusCode::NO_CONTENT
-    } else {
-        StatusCode::NOT_FOUND
-    }
-}

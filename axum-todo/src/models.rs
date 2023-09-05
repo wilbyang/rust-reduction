@@ -1,18 +1,49 @@
 use anyhow::Result;
 use libsql_client::client::Client;
-
 use libsql_client::Statement;
 use serde::Serialize;
-
 use uuid::Uuid;
 
-pub type Db = dashmap::DashMap<Uuid, Todo>;
+pub type DashMapRepo = dashmap::DashMap<Uuid, Todo>;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct Todo {
     pub id: Uuid,
     pub text: String,
     pub completed: bool,
+}
+
+// trait: save, get, delete, update and list todos
+pub trait TodoRepository: Send + Sync + 'static {// why 'static? it be
+
+    fn save(&self, todo: Todo) -> Result<()>;
+    fn get(&self, id: Uuid) -> Result<Todo>;
+    fn delete(&self, id: Uuid) -> Result<()>;
+    fn update(&self, id: Uuid, todo: Todo) -> Result<()>;
+    fn list(&self) -> Result<Vec<Todo>>;
+}
+
+impl TodoRepository for DashMapRepo {
+    fn save(&self, todo: Todo) -> Result<()> {
+        self.insert(todo.id, todo);
+        Ok(())
+    }
+    fn get(&self, id: Uuid) -> Result<Todo> {
+        let todo = self.get(&id).unwrap().clone();
+        Ok(todo)
+    }
+    fn delete(&self, id: Uuid) -> Result<()> {
+        self.remove(&id);
+        Ok(())
+    }
+    fn update(&self, id: Uuid, todo: Todo) -> Result<()> {
+        self.insert(id, todo);
+        Ok(())
+    }
+    fn list(&self) -> Result<Vec<Todo>> {
+        let todos = self.iter().map(|x| x.clone()).collect::<Vec<_>>();
+        Ok(todos)
+    }
 }
 
 pub struct SqliteDb {
