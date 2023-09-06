@@ -19,12 +19,8 @@ pub async fn todos_create(State(repo): State<Arc<dyn TodoRepository>>, Json(inpu
         completed: false,
     };
 
-    match repo.save(todo.clone()) {
-        Ok(_) => (StatusCode::CREATED, Json(todo)),
-        Err(_) => (StatusCode::CREATED, Json(todo)),
-    }
-
-
-
-
+    repo.save(todo).map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))
+        .map(|_| StatusCode::CREATED)
 }
+// curl to test create todo
+// curl -X POST -H "Content-Type: application/json" -d '{"text":"hello world"}' http://localhost:3002/todos

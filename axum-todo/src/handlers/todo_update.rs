@@ -19,5 +19,14 @@ pub async fn todos_update(
     Json(input): Json<UpdateTodo>,
 ) -> Result<impl IntoResponse, StatusCode> {
 
-    Ok(Json("todo"))
+    repo.get(id).map_err(|_| StatusCode::NOT_FOUND).and_then(|todo| {
+        let todo = Todo {
+            id,
+            text: input.text.unwrap_or(todo.text),
+            completed: input.completed.unwrap_or(todo.completed),
+        };
+        repo.update(id, todo).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
+            .map(|_| StatusCode::OK)
+    })
+
 }
