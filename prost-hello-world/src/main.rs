@@ -13,6 +13,7 @@ use tokio::net::TcpListener;
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
 
 
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let addr = "0.0.0.0:8083";
@@ -27,9 +28,9 @@ async fn main() -> Result<()> {
             // split 成 writer 和 reader
             let (mut w, mut r) = framed.split();
             while let Some(Ok(shirtb)) = r.next().await {
-                let shirt = items::Shirt::decode(shirtb)?;
+                let shirt = items::SkuItem::decode(shirtb)?;
                 println!("shirt: {:?}", shirt);
-                
+
 
                 let mut shirt = items::Shirt::default();
                 shirt.color = "color".to_string();

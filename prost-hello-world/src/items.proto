@@ -13,3 +13,14 @@ message Shirt {
     string color = 1;
     Size size = 2;
 }
+// model {"price":"26367.7","amount":"1.25","timestamp":"1694800221"}
+message SkuItem {
+    string name = 1;
+    string description = 2;
+    float price = 3;
+    int32 amount = 4;
+    int64 timestamp = 5;
+    repeated string tags = 6;
+    map<string, string> attributes = 7;
+    Shirt shirt = 8;
+}
