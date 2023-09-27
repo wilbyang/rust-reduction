@@ -15,7 +15,7 @@ pub struct Pagination {
     pub offset: Option<usize>,
     pub limit: Option<usize>,
 }
-
+#[tracing::instrument(name="xxhh",skip(repo), level="debug")]
 pub async fn todos_index(
     pagination: Option<Query<Pagination>>,
     State(repo): State<Arc<dyn TodoRepository>>,
