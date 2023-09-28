@@ -2807,6 +2807,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "wscpu"
+version = "0.1.0"
+dependencies = [
+ "axum",
+]
+
+[[package]]
 name = "xml5ever"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

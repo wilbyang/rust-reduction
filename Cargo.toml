@@ -3,5 +3,5 @@ members = [
     "axum-todo",
     "tonic-hello-world",
     "prost-hello-world",
-    "rustmath"
+    "rustmath",
 ]
