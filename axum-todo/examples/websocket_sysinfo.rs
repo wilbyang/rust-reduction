@@ -34,7 +34,6 @@ async fn main() {
     tokio::task::spawn_blocking( move ||{
         let mut system = System::new();
         loop {
-
             std::thread::sleep(std::time::Duration::from_millis(500));
             system.refresh_all();
             let cpu_metrics = system.cpus().iter().map(|c| c.cpu_usage()).collect::<Vec<f32>>();

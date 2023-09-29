@@ -18,9 +18,6 @@ pub async fn cpuinfo(ws: WebSocketUpgrade)-> impl IntoResponse {
             socket.send(Message::from(json)).await.unwrap();
             //sleep for a while
             tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-
-
-
         }
     })
 

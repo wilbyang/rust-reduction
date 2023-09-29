@@ -21,7 +21,10 @@ dashmap = "5.5"
 sled = "0.34"
 rand = "0.8"
 sysinfo = "0.29.10"
-tokio-tungstenite = "0.20.1"
+tokio-tungstenite = { version = "0.20", features = ["rustls-tls-native-roots"] }
+futures-util = "0.3"
+futures-channel = "0.3"
+url = "2.4"
 
 [dev-dependencies]
 html2md = "0.2"
@@ -35,4 +38,8 @@ name = "htm"
 
 [[example]]
 name = "websocket_sysinfo"
+
+
+[[example]]
+name = "ws_client"
 
